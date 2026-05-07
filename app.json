@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "name": "Maze Runner",
+    "slug": "maze-runner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "android": {
+      "package": "com.usefullapps.mazerunner",
+      "versionCode": 1
+    }
+  }
+}
