@@ -1,7 +1,21 @@
 {
-  "name": "mazerunner",
-  "displayName": "Maze Runner",
-  "android": {
-    "package": "com.usefullapps.mazerunner"
+  "expo": {
+    "name": "Maze Runner",
+    "slug": "maze-runner",
+    "version": "1.0.0",
+    "orientation": "portrait",
+    "icon": "./assets/icon.png",
+    "userInterfaceStyle": "light",
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#ffffff"
+      },
+      "package": "com.usefullapps.mazerunner",
+      "versionCode": 1
+    },
+    "plugins": [
+      "expo-router"
+    ]
   }
 }
