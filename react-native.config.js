@@ -1,7 +1,11 @@
 module.exports = {
   project: {
     android: {
-      unstable_reactLegacyComponentNames: ['RCTImageView'],
+      packageName: 'com.usefullapps.mazerunner',
+      sourceDir: './android',
+      appName: 'mazerunner',
+      manifestPath: './app/src/main/AndroidManifest.xml',
     },
+    ios: {},
   },
 };
