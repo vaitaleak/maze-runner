@@ -1,5 +1,5 @@
 {
-  "name": "Maze Runner",
+  "name": "mazerunner",
   "displayName": "Maze Runner",
   "android": {
     "package": "com.usefullapps.mazerunner"
