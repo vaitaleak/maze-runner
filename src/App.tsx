@@ -3,7 +3,6 @@ import {
   StyleSheet, View, Text, TouchableOpacity, Dimensions, PanResponder,
   SafeAreaView,
 } from 'react-native';
-import { StatusBar } from 'expo-status-bar';
 
 const { width, height } = Dimensions.get('window');
 const SIZES = [8, 12, 16, 20];
@@ -114,7 +113,6 @@ export default function App() {
 
   return (
     <SafeAreaView style={styles.container}>
-      <StatusBar style="light" />
       <Text style={styles.title}>Maze Runner</Text>
 
       <View style={styles.sizes}>
