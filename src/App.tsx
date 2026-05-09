@@ -44,7 +44,7 @@ function createMaze(size: number): Cell[][] {
 export default function App() {
   const [sizeIdx, setSizeIdx] = useState(0);
   const size = SIZES[sizeIdx];
-  const [maze, setMaze] = useState<Cell[][]>(() => createMaze(8));
+  const [maze, setMaze] = useState<Cell[][]>(() => createMaze(SIZES[0]));
   const [playerR, setPlayerR] = useState(0);
   const [playerC, setPlayerC] = useState(0);
   const [moves, setMoves] = useState(0);
@@ -60,13 +60,18 @@ export default function App() {
     return () => clearInterval(iv);
   }, [started, won]);
 
-  const move = useCallback((dr: number, dc: number) => {
-    if (won) return;
-    if (!started) setStarted(true);
-    const nr = playerR + dr, nc = playerC + dc;
-    if (nr < 0 || nr >= size || nc < 0 || nc >= size) return;
+  // Ref to always hold the latest game state for PanResponder (avoids stale closure)
+  const gameDataRef = useRef({ playerR, playerC, maze, size, won, started });
+  gameDataRef.current = { playerR, playerC, maze, size, won, started };
 
-    const cell = maze[playerR][playerC];
+  const move = useCallback((dr: number, dc: number) => {
+    const { playerR: pR, playerC: pC, maze: mz, size: sz, won: w, started: st } = gameDataRef.current;
+    if (w) return;
+    if (!st) setStarted(true);
+    const nr = pR + dr, nc = pC + dc;
+    if (nr < 0 || nr >= sz || nc < 0 || nc >= sz) return;
+
+    const cell = mz[pR][pC];
     if (dr === -1 && cell.top) return;
     if (dr === 1 && cell.bottom) return;
     if (dc === -1 && cell.left) return;
@@ -76,19 +81,21 @@ export default function App() {
     setPlayerC(nc);
     setMoves(m => m + 1);
 
-    if (nr === size - 1 && nc === size - 1) setWon(true);
-  }, [playerR, playerC, maze, size, won, started]);
+    if (nr === sz - 1 && nc === sz - 1) setWon(true);
+  }, []);
 
-  const panRef = useRef({ dy: 0, dx: 0 });
+  const moveRef = useRef(move);
+  moveRef.current = move;
+
   const panResponder = useRef(PanResponder.create({
     onMoveShouldSetPanResponder: () => true,
     onPanResponderRelease: (_, gs) => {
       const absDx = Math.abs(gs.dx), absDy = Math.abs(gs.dy);
       if (Math.max(absDx, absDy) < 15) return;
       if (absDx > absDy) {
-        move(0, gs.dx > 0 ? 1 : -1);
+        moveRef.current(0, gs.dx > 0 ? 1 : -1);
       } else {
-        move(gs.dy > 0 ? 1 : -1, 0);
+        moveRef.current(gs.dy > 0 ? 1 : -1, 0);
       }
     }
   })).current;
@@ -144,9 +151,9 @@ export default function App() {
                   isEnd && styles.endCell,
                   isStart && !isPlayer && styles.startCell,
                 ]}>
-                  {isPlayer && <Text style={styles.playerEmoji}>🟢</Text>}
-                  {isEnd && !isPlayer && <Text style={styles.endEmoji}>🏁</Text>}
-                  {isStart && !isPlayer && <Text style={styles.startEmoji}>S</Text>}
+                  {isPlayer && <Text style={{ fontSize: cellSize * 0.7 }}>🟢</Text>}
+                  {isEnd && !isPlayer && <Text style={{ fontSize: cellSize * 0.6 }}>🏁</Text>}
+                  {isStart && !isPlayer && <Text style={{ color: '#00ff88', fontSize: cellSize * 0.4, fontWeight: 'bold' }}>S</Text>}
                 </View>
               );
             })
@@ -201,9 +208,6 @@ const styles = StyleSheet.create({
   playerCell: { backgroundColor: '#1a3a1a' },
   endCell: { backgroundColor: '#1a1a3a' },
   startCell: { backgroundColor: '#1a2a1a' },
-  playerEmoji: { fontSize: Math.min(16, 16) },
-  endEmoji: { fontSize: Math.min(14, 14) },
-  startEmoji: { color: '#00ff88', fontSize: 10, fontWeight: 'bold' },
   dpad: { alignItems: 'center', marginBottom: 10 },
   dpadRow: { flexDirection: 'row', alignItems: 'center' },
   dpadBtn: { width: 50, height: 50, justifyContent: 'center', alignItems: 'center', backgroundColor: '#1a1a3e', borderRadius: 8, margin: 2 },
